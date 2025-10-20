@@ -31,13 +31,4 @@ const protect = async (req, res, next) => {
   }
 };
 
-// Only Admin Access
-const adminOnly = (req, res, next) => {
-  if (req.user && req.user.isAdmin) {
-    next();
-  } else {
-    res.status(403).json({ message: "Admin access only" });
-  }
-};
-
-module.exports = { protect, adminOnly };
+module.exports = { protect };

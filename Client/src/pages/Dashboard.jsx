@@ -1,130 +1,122 @@
-import React, { useState, useRef } from "react";
+import { useEffect, useState } from "react";
+import { User, Edit2, Trash2 } from "lucide-react";
+import { Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import API from "../api/axios";
-import { AiOutlineUpload } from "react-icons/ai";
+import toast from "react-hot-toast";
 
 const Dashboard = () => {
-    const [file, setFile] = useState(null);
-    const [bp, setBp] = useState("");
-    const [sugar, setSugar] = useState("");
-    const [weight, setWeight] = useState("");
-    const [notes, setNotes] = useState("");
-    const [message, setMessage] = useState("");
+    const { user } = useAuth();
+    const [members, setMembers] = useState([]);
 
-    const fileInputRef = useRef(null); // hidden file input reference
+    useEffect(() => {
+        fetchMembers();
+    }, []);
 
-    const handleFileChange = (e) => setFile(e.target.files[0]);
-
-    // Open file dialog on button click
-    const handleUploadClick = () => {
-        fileInputRef.current.click();
-    };
-
-    // Upload selected file
-    const handleUpload = async () => {
-        if (!file) return setMessage("Please select a file first");
-        const formData = new FormData();
-        formData.append("file", file);
-
+    const fetchMembers = async () => {
         try {
-            const res = await API.post("/health/add", formData, {
-                headers: { "Content-Type": "multipart/form-data" },
-            });
-            setMessage("Report uploaded successfully!");
-            console.log(res.data);
+            const res = await API.get("/api/members", { withCredentials: true });
+            setMembers(res.data);
         } catch (err) {
-            setMessage(err.response?.data?.message || "Upload failed");
+            console.error(err);
+            toast.error("Failed to fetch members");
         }
     };
 
-    // Add manual vitals
-    const handleAddVitals = async () => {
+    const handleDelete = async (id) => {
+        if (!window.confirm("Are you sure you want to delete this member?")) return;
         try {
-            const res = await API.post("/health/add", { bp, sugar, weight, notes });
-            setMessage("Vitals added successfully!");
-            console.log(res.data);
+            await API.delete(`/api/members/${id}`, { withCredentials: true });
+            setMembers((prev) => prev.filter((m) => m._id !== id));
+            toast.success("Member deleted successfully");
         } catch (err) {
-            setMessage(err.response?.data?.message || "Adding vitals failed");
+            console.error(err);
+            toast.error("Failed to delete member");
+        }
+    };
+
+    const handleEdit = async (id) => {
+        const newName = prompt("Enter new name:");
+        const newRelation = prompt("Enter new relation:");
+        if (!newName || !newRelation) return;
+
+        try {
+            const res = await API.put(`/api/members/${id}`, {
+                name: newName,
+                relation: newRelation
+            }, { withCredentials: true });
+
+            setMembers((prev) => prev.map((m) => (m._id === id ? res.data : m)));
+            toast.success("Member updated successfully");
+        } catch (err) {
+            console.error(err);
+            toast.error("Failed to update member");
         }
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-r from-blue-50 to-purple-50 p-6">
-            <h1 className="text-3xl font-bold mb-6 text-gray-800">Welcome to HealthMate</h1>
-            {message && <p className="text-green-600 mb-4">{message}</p>}
-
-            <div className="grid md:grid-cols-2 gap-6">
-                {/* Upload Report */}
-                <div className="bg-white p-6 rounded-2xl shadow-lg flex flex-col items-center">
-                    <h2 className="text-xl font-semibold mb-4">Upload Medical Report</h2>
-
-                    {/* Hidden file input */}
-                    <input
-                        type="file"
-                        ref={fileInputRef}
-                        onChange={handleFileChange}
-                        className="hidden"
-                    />
-
-                    {/* Upload button triggers file dialog */}
-                    <button
-                        onClick={handleUploadClick}
-                        className="flex items-center gap-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition mb-3"
-                    >
-                        <AiOutlineUpload /> Select File
-                    </button>
-
-                    {/* Submit selected file */}
-                    <button
-                        onClick={handleUpload}
-                        disabled={!file}
-                        className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition"
-                    >
-                        Upload Report
-                    </button>
-
-                    {file && <p className="mt-2 text-gray-700 text-sm">Selected file: {file.name}</p>}
-                </div>
-
-                {/* Add Manual Vitals */}
-                <div className="bg-white p-6 rounded-2xl shadow-lg">
-                    <h2 className="text-xl font-semibold mb-4">Add Manual Vitals</h2>
-                    <div className="grid gap-3">
-                        <input
-                            type="text"
-                            placeholder="BP (e.g., 120/80)"
-                            value={bp}
-                            onChange={(e) => setBp(e.target.value)}
-                            className="border px-3 py-2 rounded"
-                        />
-                        <input
-                            type="number"
-                            placeholder="Sugar (mg/dL)"
-                            value={sugar}
-                            onChange={(e) => setSugar(e.target.value)}
-                            className="border px-3 py-2 rounded"
-                        />
-                        <input
-                            type="number"
-                            placeholder="Weight (kg)"
-                            value={weight}
-                            onChange={(e) => setWeight(e.target.value)}
-                            className="border px-3 py-2 rounded"
-                        />
-                        <textarea
-                            placeholder="Notes"
-                            value={notes}
-                            onChange={(e) => setNotes(e.target.value)}
-                            className="border px-3 py-2 rounded"
-                        />
-                        <button
-                            onClick={handleAddVitals}
-                            className="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600 transition"
-                        >
-                            Add Vitals
-                        </button>
-                    </div>
-                </div>
+        <div className="min-h-screen bg-blue-50 px-4 py-6">
+            <div className="flex justify-end mb-6">
+                <Link
+                    to="/add-member"
+                    className="bg-gradient-to-r from-pink-500 to-orange-400 text-white px-5 py-2 rounded-full font-semibold hover:opacity-90 transition"
+                >
+                    + Add Family Member
+                </Link>
             </div>
+
+            {members.length === 0 ? (
+                <div className="text-center text-gray-600 text-lg mt-24">
+                    No family members yet. Add one to get started!
+                </div>
+            ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {members.map((member) => (
+                        <div key={member._id} className="bg-white rounded-2xl shadow p-4 flex flex-col justify-between">
+                            {/* Upper Portion */}
+                            <div className="flex justify-between mb-4">
+                                {/* Left */}
+                                <div className="flex items-center gap-3">
+                                    <div className="w-14 h-14 rounded-full bg-gradient-to-r from-pink-500 to-orange-400 flex items-center justify-center text-white text-2xl font-bold">
+                                        {member.name.charAt(0).toUpperCase()}
+                                    </div>
+                                    <div>
+                                        <h3 className="font-bold text-gray-800">{member.name}</h3>
+                                        <p className="text-gray-600">{member.relation}</p>
+                                    </div>
+                                </div>
+
+                                {/* Right */}
+                                <div className="text-right text-gray-600">
+                                    <p className="text-sm">Last activity</p>
+                                    <p className="text-xs mt-1">{new Date(member.updatedAt).toLocaleString()}</p>
+                                </div>
+                            </div>
+
+                            {/* Lower Portion */}
+                            <div className="flex justify-between items-center mt-2">
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={() => handleEdit(member._id)}
+                                        className="flex items-center gap-1 border border-gray-300 px-3 py-1 rounded-md text-pink-500 hover:bg-pink-50 transition cursor-pointer"
+                                    >
+                                        <Edit2 size={16} /> Edit
+                                    </button>
+                                    <button
+                                        onClick={() => handleDelete(member._id)}
+                                        className="flex items-center gap-1 border border-gray-300 px-3 py-1 rounded-md text-pink-500 hover:bg-pink-50 transition cursor-pointer"
+                                    >
+                                        <Trash2 size={16} /> Delete
+                                    </button>
+                                </div>
+                                <Link to={`/member/${member._id}`} className="text-pink-500 hover:underline font-medium">
+                                    Open
+                                </Link>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
         </div>
     );
 };

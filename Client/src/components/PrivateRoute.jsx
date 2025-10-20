@@ -1,17 +1,22 @@
-import { useContext } from "react";
 import { Navigate } from "react-router-dom";
-import { AuthContext } from "../context/AuthContext";
+import { useAuth } from "../context/AuthContext";
 
-export default function PrivateRoute({ children, adminOnly = false }) {
-    const { user, loading } = useContext(AuthContext);
+const PrivateRoute = ({ children }) => {
+    const { user, loading } = useAuth();
 
-    if (loading) return <div className="pt-24 text-center">Loading...</div>;
-    if (!user) return <Navigate to="/login" replace />;
+    if (loading) {
+        return (
+            <div className="flex justify-center items-center min-h-screen text-lg font-semibold text-gray-600">
+                Checking authentication...
+            </div>
+        );
+    }
 
-    // 🧠 admin-only protection
-    if (adminOnly && !user.isAdmin) {
-        return <Navigate to="/" replace />;
+    if (!user) {
+        return <Navigate to="/login" replace />;
     }
 
     return children;
-}
+};
+
+export default PrivateRoute;

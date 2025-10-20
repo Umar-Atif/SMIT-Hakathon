@@ -1,53 +1,175 @@
-import React, { useState, useContext } from "react";
-import { AiOutlineUser, AiOutlineMail, AiOutlineLock } from "react-icons/ai";
-import API from "../api/axios";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../context/AuthContext";
+import { useAuth } from "../context/AuthContext";
+import toast from "react-hot-toast";
 
 const Register = () => {
-    const navigate = useNavigate();
-    const { setUser } = useContext(AuthContext);
-    const [form, setForm] = useState({ name: "", email: "", password: "" });
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState("");
+    const [formData, setFormData] = useState({
+        name: "",
+        email: "",
+        password: "",
+        confirmPassword: "",
+        agreeTerms: false,
+    });
 
-    const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+    const { register } = useAuth();
+    const navigate = useNavigate();
+
+    const handleChange = (e) => {
+        const { name, value, type, checked } = e.target;
+        setFormData((prev) => ({
+            ...prev,
+            [name]: type === "checkbox" ? checked : value,
+        }));
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setLoading(true);
-        setError("");
-        try {
-            const res = await API.post("/auth/register", form);
-            setUser(res.data);
-            navigate("/dashboard");
-        } catch (err) {
-            setError(err.response?.data?.message || "Something went wrong");
+
+        if (formData.password !== formData.confirmPassword) {
+            return toast.error("Passwords do not match");
         }
-        setLoading(false);
+        if(formData.password.length < 8) {
+            return toast.error("Password must be at least 8 characters");
+        }
+        if (!formData.agreeTerms) {
+            return toast.error("Please agree to terms & privacy");
+        }
+
+        const success = await register({
+            name: formData.name,
+            email: formData.email,
+            password: formData.password,
+        });
+
+        if (success) navigate("/dashboard");
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-r from-blue-50 to-purple-50 flex items-center justify-center p-4">
-            <div className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md">
-                <h2 className="text-3xl font-bold text-center text-gray-800 mb-6">Register</h2>
-                {error && <p className="text-red-500 text-center mb-4">{error}</p>}
-                <form className="space-y-4" onSubmit={handleSubmit}>
-                    <div className="flex items-center border px-3 py-2 rounded">
-                        <AiOutlineUser className="text-gray-400 mr-2" />
-                        <input type="text" name="name" placeholder="Full Name" value={form.name} onChange={handleChange} className="w-full outline-none" required />
+        <div className="min-h-screen bg-blue-50 p-6 flex justify-center items-center">
+            <div className="max-w-5xl w-full grid md:grid-cols-2 gap-10 p-8 rounded-2xl">
+                {/* Left Section */}
+                <div>
+                    <div className="text-left mb-8">
+                        <h1 className="text-2xl font-bold text-gray-900 mb-2">
+                            Create your account
+                        </h1>
+                        <p className="text-gray-600">
+                            Manage your health reports, vitals, and insights easily.
+                        </p>
                     </div>
-                    <div className="flex items-center border px-3 py-2 rounded">
-                        <AiOutlineMail className="text-gray-400 mr-2" />
-                        <input type="email" name="email" placeholder="Email" value={form.email} onChange={handleChange} className="w-full outline-none" required />
+
+                    <ul className="space-y-3 mb-6 text-gray-700 text-sm">
+                        <li>✅ Upload & explain reports via Gemini.</li>
+                        <li>✅ Track BP, sugar, weight trends.</li>
+                        <li>✅ Full privacy — your data is encrypted.</li>
+                    </ul>
+                </div>
+
+                {/* Right Section */}
+                <form
+                    onSubmit={handleSubmit}
+                    className="bg-white p-8 rounded-2xl shadow-md space-y-5"
+                >
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Full Name
+                        </label>
+                        <input
+                            type="text"
+                            name="name"
+                            value={formData.name}
+                            onChange={handleChange}
+                            placeholder="e.g. Ayesha Khan"
+                            required
+                            className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
+                        />
                     </div>
-                    <div className="flex items-center border px-3 py-2 rounded">
-                        <AiOutlineLock className="text-gray-400 mr-2" />
-                        <input type="password" name="password" placeholder="Password" value={form.password} onChange={handleChange} className="w-full outline-none" required />
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Email
+                        </label>
+                        <input
+                            type="email"
+                            name="email"
+                            value={formData.email}
+                            onChange={handleChange}
+                            placeholder="you@example.com"
+                            required
+                            className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
+                        />
                     </div>
-                    <button type="submit" className="w-full bg-purple-500 text-white py-2 rounded hover:bg-purple-600 transition" disabled={loading}>
-                        {loading ? "Registering..." : "Register"}
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Password
+                        </label>
+                        <input
+                            type="password"
+                            name="password"
+                            value={formData.password}
+                            onChange={handleChange}
+                            placeholder="At least 8 characters"
+                            required
+                            className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Confirm Password
+                        </label>
+                        <input
+                            type="password"
+                            name="confirmPassword"
+                            value={formData.confirmPassword}
+                            onChange={handleChange}
+                            placeholder="Re-enter password"
+                            required
+                            className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
+                        />
+                    </div>
+
+                    <div className="flex items-start">
+                        <input
+                            type="checkbox"
+                            name="agreeTerms"
+                            checked={formData.agreeTerms}
+                            onChange={handleChange}
+                            className="w-4 h-4 text-blue-600 border-gray-400 rounded focus:ring-blue-500 mt-0.5 mr-2"
+                        />
+                        <label className="text-gray-700 text-sm">
+                            I agree to the{" "}
+                            <span className="font-medium text-pink-600 underline">
+                                Terms
+                            </span>{" "}
+                            &{" "}
+                            <span className="font-medium text-pink-600 underline">
+                                Privacy
+                            </span>
+                            .
+                        </label>
+                    </div>
+
+                    <button
+                        type="submit"
+                        className="bg-gradient-to-r from-pink-500 to-orange-400 text-white font-semibold rounded-full px-4 py-2 hover:opacity-90 transition cursor-pointer w-full"
+                    >
+                        Create account
                     </button>
+
+                    <div className="text-center mt-4">
+                        <p className="text-gray-600 text-sm">
+                            Already have an account?{" "}
+                            <span
+                                onClick={() => navigate("/login")}
+                                className="text-pink-600 font-medium cursor-pointer hover:underline"
+                            >
+                                Sign in
+                            </span>
+                        </p>
+                    </div>
                 </form>
             </div>
         </div>

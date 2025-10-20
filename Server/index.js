@@ -4,7 +4,8 @@ const cookieParser = require('cookie-parser');
 const dotenv = require('dotenv').config();
 
 const authRoutes = require("./routes/authRoutes");
-const healthRoutes = require("./routes/healthRoutes"); 
+const memberRoutes = require("./routes/memberRoutes");
+const reportRoutes = require("./routes/reportRoutes");
 
 const express = require('express');
 const app = express();
@@ -33,7 +34,8 @@ app.get('/', (req, res) => {
 });
 
 app.use("/api/auth", authRoutes);
-app.use("/api/health", healthRoutes);
+app.use("/api/members", memberRoutes);
+app.use("/api/reports", reportRoutes);
 
 app.listen(process.env.PORT, () => {
     console.log("Server is running")
