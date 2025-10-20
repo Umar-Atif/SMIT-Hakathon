@@ -5,7 +5,7 @@ import { useAuth } from "../context/AuthContext"
 
 const Header = () => {
     const [menuOpen, setMenuOpen] = useState(false);
-    const { user, logout } = useAuth(); 
+    const { user, logout } = useAuth();
 
     return (
         <header className="bg-white shadow-sm sticky top-0 z-50">
@@ -26,8 +26,9 @@ const Header = () => {
                         </>
                     ) : (
                         <>
+                            <Link to="/" className="hover:text-pink-600">Home</Link>
                             <Link to="/dashboard" className="hover:text-pink-600">Dashboard</Link>
-                            <Link to="/profile" className="hover:text-pink-600">Profile</Link> 
+                            <Link to="/profile" className="hover:text-pink-600">Profile</Link>
                         </>
                     )}
                 </nav>
@@ -52,7 +53,8 @@ const Header = () => {
                     ) : (
                         <button
                             onClick={logout}
-                            className="bg-gradient-to-r from-pink-500 to-orange-400 text-white px-4 py-2 rounded-full text-lg font-semibold hover:opacity-90 transition cursor-pointer"                        >
+                            className="bg-gradient-to-r from-pink-500 to-orange-400 text-white px-6 py-2 rounded-full text-lg font-semibold hover:opacity-90 transition cursor-pointer"
+                        >
                             Logout
                         </button>
                     )}
@@ -88,6 +90,7 @@ const Header = () => {
                             </>
                         ) : (
                             <>
+                                <Link to="/" onClick={() => setMenuOpen(false)} className="text-gray-700 hover:text-pink-600">Home</Link>
                                 <Link to="/dashboard" onClick={() => setMenuOpen(false)} className="text-gray-700 hover:text-pink-600">Dashboard</Link>
                                 <Link to="/profile" onClick={() => setMenuOpen(false)} className="text-gray-700 hover:text-pink-600">Profile</Link>
                                 <button

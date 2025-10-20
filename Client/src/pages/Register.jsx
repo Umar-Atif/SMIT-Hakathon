@@ -55,15 +55,20 @@ const Register = () => {
                             Create your account
                         </h1>
                         <p className="text-gray-600">
-                            Manage your health reports, vitals, and insights easily.
+                            One place for reports, vitals and AI insights. <span className="text-pink-600 font-medium">Bilkul asaan.</span>
                         </p>
                     </div>
 
-                    <ul className="space-y-3 mb-6 text-gray-700 text-sm">
-                        <li>✅ Upload & explain reports via Gemini.</li>
-                        <li>✅ Track BP, sugar, weight trends.</li>
-                        <li>✅ Full privacy — your data is encrypted.</li>
+                    <ul className="space-y-3 mb-6 text-gray-600 text-sm">
+                        <li>✅ Upload PDFs & photos of reports — Gemini explains in EN + Roman Urdu.</li>
+                        <li>✅ Track manual <b>Vitals</b> (BP, Sugar, Weight) with reminders.</li>
+                        <li>✅ Privacy first: encrypted storage, signed links for doctors.</li>
                     </ul>
+
+                    <div className="bg-white p-4 rounded-md shadow-md">
+                        <p className="font-medium text-pink-600 mb-2">We respect your privacy.</p>
+                        <p className="text-gray-700">HealthMate shares nothing without your permissions. You own your data.</p>
+                    </div>
                 </div>
 
                 {/* Right Section */}

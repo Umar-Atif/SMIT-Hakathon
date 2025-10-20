@@ -12,10 +12,13 @@ export default function Home() {
         <div className="inline-block mb-4 px-4 py-1 rounded-full bg-pink-100 text-pink-700 font-medium text-sm">
           🤖 AI-powered Health Companion
         </div>
-        <h1 className="text-4xl md:text-5xl font-extrabold leading-tight mb-4">
+        {/* <h1 className="text-4xl md:text-5xl font-extrabold leading-tight mb-4">
           Manage your <span className="text-pink-600">health</span>,{" "}
           <span className="text-orange-500">reports</span> & <br />
           <span className="text-yellow-500">vitals</span> — beautifully
+        </h1> */}
+        <h1 className="text-4xl md:text-5xl font-extrabold leading-tight mb-4">
+          Manage your health, reports & <br /> vitals — beautifully
         </h1>
         <p className="max-w-2xl mx-auto text-gray-600 mb-4">
           Upload your medical reports, get AI-powered explanations, and track your vitals — all in one colorful, easy experience.

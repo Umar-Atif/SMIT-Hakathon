@@ -33,30 +33,46 @@ const MemberDashboard = () => {
                 </Link>
             </div>
 
+            {/* Responsive Table */}
             {reports.length === 0 ? (
                 <div className="text-center text-gray-600 text-lg mt-24">
                     No reports yet. Add one to get started!
                 </div>
             ) : (
-                <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-1">
-                    {reports.map((report) => (
-                        <div key={report._id} className="bg-white rounded-2xl shadow p-4 sm:p-6">
-                            <div className="flex justify-between items-center mb-2">
-                                <h3 className="font-semibold text-lg">{report.title || report.testName}</h3>
-                                <Link
-                                    to={`/report/${report._id}`}
-                                    className="text-pink-500 hover:underline font-medium"
-                                >
-                                    View
-                                </Link>
-                            </div>
-                            <p><span className="font-semibold">Test:</span> {report.testName}</p>
-                            <p><span className="font-semibold">Lab/Hospital:</span> {report.hospital}</p>
-                            <p><span className="font-semibold">Doctor:</span> {report.doctor}</p>
-                            <p><span className="font-semibold">Date:</span> {new Date(report.date).toLocaleDateString()}</p>
-                            <p><span className="font-semibold">Price:</span> {report.price}</p>
-                        </div>
-                    ))}
+                <div className="overflow-x-auto">
+                    <table className="min-w-full bg-white rounded-2xl shadow overflow-hidden">
+                        <thead className="bg-gray-100">
+                            <tr>
+                                <th className="text-left py-3 px-4 font-semibold">Title</th>
+                                <th className="text-left py-3 px-4 font-semibold">Test</th>
+                                <th className="text-left py-3 px-4 font-semibold">Lab/Hospital</th>
+                                <th className="text-left py-3 px-4 font-semibold">Doctor</th>
+                                <th className="text-left py-3 px-4 font-semibold">Date</th>
+                                <th className="text-left py-3 px-4 font-semibold">Price</th>
+                                <th className="text-left py-3 px-4 font-semibold">View</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {reports.map((report) => (
+                                <tr key={report._id} className="border-b hover:bg-gray-50">
+                                    <td className="py-2 px-4">{report.title || "-"}</td>
+                                    <td className="py-2 px-4">{report.testName}</td>
+                                    <td className="py-2 px-4">{report.hospital}</td>
+                                    <td className="py-2 px-4">{report.doctor}</td>
+                                    <td className="py-2 px-4">{new Date(report.date).toLocaleDateString()}</td>
+                                    <td className="py-2 px-4">{report.price}</td>
+                                    <td className="py-2 px-4">
+                                        <Link
+                                            to={`/report/${report._id}`}
+                                            className="text-pink-500 hover:underline font-medium"
+                                        >
+                                            View
+                                        </Link>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
                 </div>
             )}
         </div>
