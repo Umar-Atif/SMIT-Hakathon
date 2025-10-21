@@ -11,28 +11,17 @@ const express = require('express');
 const app = express();
 
 //Database
-let isConnected = false;
-async function connectDB() {
-    try {
-        await mongoose.connect(process.env.MONGO_URI, { dbName: "Ecommerce" });
-        isConnected = true;
-        console.log("✅ MongoDB connected");
-    } catch (err) {
-        console.error("Error connecting to MongoDB:", err);
-    }
-}
-app.use((req, res, next) => {
-    if (!isConnected) connectDB();
-    next();
-});
+mongoose.connect(process.env.MONGO_URI, { dbName: "HealthMate" }) 
+    .then(() => {
+        console.log('DB Connected');
+    })
+    .catch((err) => {
+        console.error(err)
+    });
 
 // Middlewares
-const allowedOrigins = ["http://localhost:5173"];
 app.use(cors({
-    origin: function (origin, callback) {
-        if (!origin || allowedOrigins.includes(origin)) callback(null, true);
-        else callback(new Error("Not allowed by CORS"));
-    },
+    origin: "http://localhost:5173",
     credentials: true
 }));
 app.use(express.json());
@@ -48,7 +37,6 @@ app.use("/api/auth", authRoutes);
 app.use("/api/members", memberRoutes);
 app.use("/api/reports", reportRoutes);
 
-// app.listen(process.env.PORT, () => {
-//     console.log("Server is running")
-// });
-module.exports = app;
+app.listen(process.env.PORT, () => {
+    console.log("Server is running")
+});
