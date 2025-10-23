@@ -10,41 +10,40 @@ const reportRoutes = require("./routes/reportRoutes");
 const express = require('express');
 const app = express();
 
-//Database
-let isConnected = false;
-async function connectDB() {
+// ✅ Connect to MongoDB once (Vercel-friendly)
+const connectDB = async () => {
+    if (mongoose.connection.readyState >= 1) return;
     try {
         await mongoose.connect(process.env.MONGO_URI, { dbName: "Ecommerce" });
-        isConnected = true;
         console.log("✅ MongoDB connected");
     } catch (err) {
-        console.error("Error connecting to MongoDB:", err);
+        console.error("❌ MongoDB connection error:", err);
     }
-}
-app.use((req, res, next) => {
-    if (!isConnected) connectDB();
-    next();
-});
+};
+connectDB();
 
-// Middlewares
+// ✅ CORS setup (allow frontend URLs)
 app.use(cors({
-    origin: ["http://localhost:5173"],
-    credentials: true
+    origin: [
+        "http://localhost:5173",                  // local dev
+        "https://healthmate-frontend.vercel.app"  // 👈 replace with your actual frontend URL
+    ],
+    credentials: true,
 }));
+
+// ✅ Other middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-//Routes
+// ✅ Routes
 app.get('/', (req, res) => {
-    res.send("HealthMate API running...")
+    res.send("HealthMate API running...");
 });
 
 app.use("/api/auth", authRoutes);
 app.use("/api/members", memberRoutes);
 app.use("/api/reports", reportRoutes);
 
-// app.listen(process.env.PORT, () => {
-//     console.log("Server is running")
-// });
+// ✅ Export for Vercel serverless
 module.exports = app;
