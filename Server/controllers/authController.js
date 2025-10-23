@@ -33,7 +33,7 @@ const registerUser = async (req, res) => {
 
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: "Error in register" });
+        res.status(500).json({ message: "Error in register", error });
     }
 };
 

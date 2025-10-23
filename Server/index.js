@@ -14,10 +14,10 @@ const app = express();
 const connectDB = async () => {
     if (mongoose.connection.readyState >= 1) return;
     try {
-        await mongoose.connect(process.env.MONGO_URI, { dbName: "Ecommerce" });
+        await mongoose.connect(process.env.MONGO_URI, { dbName: "HealthMate" });
         console.log("✅ MongoDB connected");
     } catch (err) {
-        console.error("❌ MongoDB connection error:", err);
+        console.error("❌ MongoDB connection error:");
     }
 };
 connectDB();
