@@ -1,29 +1,19 @@
-// controllers/reportController.js
 const Report = require("../models/Report");
-const cloudinary = require("../configs/cloudinary");
-const fs = require("fs");
 
 // ✅ Add new report
 const addReport = async (req, res) => {
     try {
-        const { member, title, testName, hospital, doctor, date, price, additionalNotes,
-            bpSystolic, bpDiastolic, temp, fastingSugar, height, weight } = req.body;
+        const {
+            member, title, testName, hospital, doctor, date, price, additionalNotes,
+            bpSystolic, bpDiastolic, temp, fastingSugar, height, weight
+        } = req.body;
 
         if (!member || !testName || !hospital || !doctor || !date || !price) {
             return res.status(400).json({ message: "Required fields missing" });
         }
 
-        // Files upload
-        let uploadedFiles = [];
-        if (req.files && req.files.length > 0) {
-            for (const file of req.files) {
-                const result = await cloudinary.uploader.upload(file.path, { folder: "HealthMateReports" });
-                uploadedFiles.push(result.secure_url);
-                fs.unlinkSync(file.path); // Remove temp file
-            }
-        }
+        const uploadedFiles = req.files.map(file => file.path); // Cloudinary URLs
 
-        // Create report
         const report = new Report({
             user: req.user._id,
             member,

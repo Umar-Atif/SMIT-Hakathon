@@ -1,12 +1,14 @@
 const multer = require("multer");
-const path = require("path");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const cloudinary = require("../configs/cloudinary");
 
-// Temp storage
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => cb(null, "uploads/"),
-    filename: (req, file, cb) => {
-        const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1E9);
-        cb(null, uniqueSuffix + path.extname(file.originalname));
+const storage = new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: {
+        folder: "HealthMateReports",       // Folder name on Cloudinary
+        allowed_formats: ["jpg", "jpeg", "png", "pdf"],
+        resource_type: "auto",             // to allow both images & pdf
+        public_id: (req, file) => Date.now() + "-" + file.originalname.split('.')[0],
     },
 });
 
