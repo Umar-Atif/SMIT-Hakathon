@@ -25,8 +25,8 @@ connectDB();
 // ✅ CORS setup (allow frontend URLs)
 app.use(cors({
     origin: [
-        "http://localhost:5173",                  // local dev
-        "https://healthmate-frontend.vercel.app"  // 👈 replace with your actual frontend URL
+        "http://localhost:5173",
+        "https://healthmate-frontend-1234.vercel.app"  
     ],
     credentials: true,
 }));
